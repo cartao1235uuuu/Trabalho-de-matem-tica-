@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infográfico Interativo - Funções Logarítmicas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            color: #fff;
+            overflow-x: hidden;
+            background: #0f0c29;
+        }
+
+        .background-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .background-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .bg1 {
+            background-image: linear-gradient(rgba(15, 12, 41, 0.8), rgba(15, 12, 41, 0.8)), 
+                              url('https://images.unsplash.com/photo-1635070041078-e363dbe005cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+            opacity: 1;
+        }
+
+        .bg2 {
+            background-image: linear-gradient(rgba(26, 42, 108, 0.8), rgba(26, 42, 108, 0.8)), 
+                              url('https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+        }
+
+        .bg3 {
+            background-image: linear-gradient(rgba(178, 31, 31, 0.8), rgba(178, 31, 31, 0.8)), 
+                              url('https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(45deg, #fdbb2d, #ff6b6b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 60px 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease;
+        }
+
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-align: center;
+            background: linear-gradient(45deg, #fdbb2d, #ff6b6b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .text-content {
+            flex: 1;
+            min-width: 300px;
+            font-size: 1.2rem;
+            line-height: 1.7;
+        }
+
+        .visual-content {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .graph-container {
+            width: 100%;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 20px;
+        }
+
+        .graph {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .grid-line {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .grid-line.vertical {
+            width: 1px;
+            height: 100%;
+            top: 0;
+        }
+
+        .grid-line.horizontal {
+            width: 100%;
+            height: 1px;
+            left: 0;
+        }
+
+        .axis {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 2;
+        }
+
+        .x-axis {
+            width: 100%;
+            height: 2px;
+            bottom: 50px;
+            left: 0;
+        }
+
+        .y-axis {
+            width: 2px;
+            height: 100%;
+            left: 50px;
+            top: 0;
+        }
+
+        .axis-label {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 12px;
+            z-index: 3;
+        }
+
+        .x-label {
+            bottom: 30px;
+            transform: translateX(-50%);
+        }
+
+        .y-label {
+            left: 30px;
+            transform: translateY(-50%);
+        }
+
+        .log-curve {
+            position: absolute;
+            width: calc(100% - 100px);
+            height: calc(100% - 100px);
+            bottom: 50px;
+            left: 50px;
+            border: none;
+        }
+
+        .log-point {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #fdbb2d;
+            border-radius: 50%;
+            transform: translate(-50%, 50%);
+            z-index: 4;
+            box-shadow: 0 0 5px rgba(253, 187, 45, 0.7);
+        }
+
+        .point-label {
+            position: absolute;
+            color: #fdbb2d;
+            font-size: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 2px 5px;
+            border-radius: 3px;
+            transform: translate(-50%, -100%);
+            white-space: nowrap;
+            z-index: 5;
+        }
+
+        .curve-line {
+            position: absolute;
+            height: 2px;
+            background: #fdbb2d;
+            transform-origin: left center;
+            z-index: 3;
+        }
+
+        .interactive-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin: 30px 0;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            width: 200px;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn.active {
+            background: rgba(253, 187, 45, 0.3);
+            border: 1px solid rgba(253, 187, 45, 0.5);
+            box-shadow: 0 0 20px rgba(253, 187, 45, 0.4);
+        }
+
+        .info-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.5s ease;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            margin-top: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .info-content.active {
+            max-height: 500px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+
+        .info-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #fdbb2d;
+        }
+
+        .info-content p {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .info-content ul {
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .info-content li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .application-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            width: 280px;
+            text-align: center;
+            transition: all 0.4s ease;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #fdbb2d;
+        }
+
+        .card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            margin-top: 60px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+            
+            h2 {
+                font-size: 2rem;
+            }
+            
+            .section {
+                padding: 25px;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .graph-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-container">
+        <div class="background-slide bg1"></div>
+        <div class="background-slide bg2"></div>
+        <div class="background-slide bg3"></div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>Funções Logarítmicas</h1>
+            <p class="subtitle">Explore as características, propriedades e aplicações das funções logarítmicas através deste infográfico interativo.</p>
+        </header>
+
+        <section id="definicao" class="section">
+            <h2>O que é uma Função Logarítmica?</h2>
+            <div class="content">
+                <div class="text-content">
+                    <p>Uma função logarítmica é definida como <strong>f(x) = log<sub>a</sub>x</strong>, onde:</p>
+                    <ul>
+                        <li><strong>a</strong> é a base do logaritmo (a > 0 e a ≠ 1)</li>
+                        <li><strong>x</strong> é o argumento (x > 0)</li>
+                    </ul>
+                    <p>A função logarítmica é a inversa da função exponencial. Isso significa que se y = log<sub>a</sub>x, então a<sup>y</sup> = x.</p>
+                    <p>O domínio da função logarítmica são todos os números reais positivos, e a imagem são todos os números reais.</p>
+                </div>
+                <div class="visual-content">
+                    <div class="graph-container">
+                        <div class="graph">
+                            <!-- Linhas de grade verticais -->
+                            <div class="grid-line vertical" style="left: 25%"></div>
+                            <div class="grid-line vertical" style="left: 50%"></div>
+                            <div class="grid-line vertical" style="left: 75%"></div>
+                            
+                            <!-- Linhas de grade horizontais -->
+                            <div class="grid-line horizontal" style="top: 25%"></div>
+                            <div class="grid-line horizontal" style="top: 50%"></div>
+                            <div class="grid-line horizontal" style="top: 75%"></div>
+                            
+                            <!-- Eixos -->
+                            <div class="axis x-axis"></div>
+                            <div class="axis y-axis"></div>
+                            
+                            <!-- Rótulos do eixo X -->
+                            <div class="axis-label x-label" style="left: 10%">0.5</div>
+                            <div class="axis-label x-label" style="left: 25%">1</div>
+                            <div class="axis-label x-label" style="left: 50%">2</div>
+                            <div class="axis-label x-label" style="left: 75%">4</div>
+                            <div class="axis-label x-label" style="left: 90%">8</div>
+                            
+                            <!-- Rótulos do eixo Y -->
+                            <div class="axis-label y-label" style="top: 10%">3</div>
+                            <div class="axis-label y-label" style="top: 25%">2</div>
+                            <div class="axis-label y-label" style="top: 50%">1</div>
+                            <div class="axis-label y-label" style="top: 75%">0</div>
+                            <div class="axis-label y-label" style="top: 90%">-1</div>
+                            
+                            <!-- Curva logarítmica -->
+                            <div class="log-curve">
+                                <!-- Pontos da curva logarítmica base 2 -->
+                                <div class="log-point" style="left: 10%; bottom: 90%">
+                                    <div class="point-label">(0.5, -1)</div>
+                                </div>
+                                <div class="log-point" style="left: 25%; bottom: 75%">
+                                    <div class="point-label">(1, 0)</div>
+                                </div>
+                                <div class="log-point" style="left: 50%; bottom: 50%">
+                                    <div class="point-label">(2, 1)</div>
+                                </div>
+                                <div class="log-point" style="left: 75%; bottom: 25%">
+                                    <div class="point-label">(4, 2)</div>
+                                </div>
+                                <div class="log-point" style="left: 90%; bottom: 10%">
+                                    <div class="point-label">(8, 3)</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Linhas da curva -->
+                            <div class="curve-line" style="left: 10%; bottom: 90%; width: 15%; transform: rotate(-63deg)"></div>
+                            <div class="curve-line" style="left: 25%; bottom: 75%; width: 25%; transform: rotate(-45deg)"></div>
+                            <div class="curve-line" style="left: 50%; bottom: 50%; width: 25%; transform: rotate(-27deg)"></div>
+                            <div class="curve-line" style="left: 75%; bottom: 25%; width: 15%; transform: rotate(-14deg)"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="interactive-buttons">
+                <div class="button-group">
+                    <button class="btn" onclick="toggleInfo('propriedades')">Propriedades</button>
+                    <div id="propriedades-content" class="info-content">
+                        <h3>Propriedades dos Logaritmos</h3>
+                        <p><strong>1) Logaritmo do Produto:</strong><br>logₐ(xy) = logₐx + logₐy</p>
+                        <p><strong>2) Logaritmo do Quociente:</strong><br>logₐ(x/y) = logₐx - logₐy</p>
+                        <p><strong>3) Logaritmo da Potência:</strong><br>logₐ(xⁿ) = n·logₐx</p>
+                        <p><strong>4) Logaritmo da Base:</strong><br>logₐa = 1</p>
+                        <p><strong>5) Logaritmo de 1:</strong><br>logₐ1 = 0</p>
+                        <p><strong>6) Mudança de Base:</strong><br>logₐb = logₓb / logₓa</p>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn" onclick="toggleInfo('graficos')">Gráficos</button>
+                    <div id="graficos-content" class="info-content">
+                        <h3>Gráficos das Funções Logarítmicas</h3>
+                        <p><strong>Características dos gráficos:</strong></p>
+                        <ul>
+                            <li>São crescentes quando a base > 1</li>
+                            <li>São decrescentes quando 0 < base < 1</li>
+                            <li>Passam sempre pelo ponto (1,0)</li>
+                            <li>Tem o eixo y como assíntota vertical</li>
+                            <li>Não interceptam o eixo y</li>
+                            <li>São funções contínuas em seu domínio</li>
+                            <li>Tem domínio: (0, +∞)</li>
+                            <li>Tem imagem: (-∞, +∞)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn" onclick="toggleInfo('exemplos')">Exemplos</button>
+                    <div id="exemplos-content" class="info-content">
+                        <h3>Exemplos de Funções Logarítmicas</h3>
+                        <p><strong>1) Logaritmo na base 2:</strong><br>f(x) = log₂x</p>
+                        <p><strong>2) Logaritmo comum (base 10):</strong><br>f(x) = log x</p>
+                        <p><strong>3) Logaritmo natural (base e):</strong><br>f(x) = ln x</p>
+                        <p><strong>4) Logaritmo com translação horizontal:</strong><br>f(x) = log₅(x+1)</p>
+                        <p><strong>5) Logaritmo com transformações:</strong><br>f(x) = 2·log₃(x) - 1</p>
+                        <p><strong>6) Logaritmo com reflexão:</strong><br>f(x) = -log₂x</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="caracteristicas" class="section">
+            <h2>Características das Funções Logarítmicas</h2>
+            <div class="content">
+                <div class="text-content">
+                    <p>As funções logarítmicas possuem características importantes:</p>
+                    <ul>
+                        <li>São funções contínuas e crescentes (quando a > 1)</li>
+                        <li>São funções contínuas e decrescentes (quando 0 < a < 1)</li>
+                        <li>O gráfico sempre intercepta o eixo x no ponto (1, 0)</li>
+                        <li>O eixo y é uma assíntota vertical do gráfico</li>
+                        <li>São funções injetoras (um-para-um)</li>
+                    </ul>
+                    <p>O comportamento da função varia conforme o valor da base:</p>
+                    <ul>
+                        <li>Base > 1: função crescente</li>
+                        <li>0 < Base < 1: função decrescente</li>
+                    </ul>
+                </div>
+                <div class="visual-content">
+                    <div class="graph-container">
+                        <div class="graph">
+                            <!-- Linhas de grade verticais -->
+                            <div class="grid-line vertical" style="left: 25%"></div>
+                            <div class="grid-line vertical" style="left: 50%"></div>
+                            <div class="grid-line vertical" style="left: 75%"></div>
+                            
+                            <!-- Linhas de grade horizontais -->
+                            <div class="grid-line horizontal" style="top: 25%"></div>
+                            <div class="grid-line horizontal" style="top: 50%"></div>
+                            <div class="grid-line horizontal" style="top: 75%"></div>
+                            
+                            <!-- Eixos -->
+                            <div class="axis x-axis"></div>
+                            <div class="axis y-axis"></div>
+                            
+                            <!-- Rótulos do eixo X -->
+                            <div class="axis-label x-label" style="left: 10%">0.5</div>
+                            <div class="axis-label x-label" style="left: 25%">1</div>
+                            <div class="axis-label x-label" style="left: 50%">2</div>
+                            <div class="axis-label x-label" style="left: 75%">4</div>
+                            <div class="axis-label x-label" style="left: 90%">8</div>
+                            
+                            <!-- Rótulos do eixo Y -->
+                            <div class="axis-label y-label" style="top: 10%">3</div>
+                            <div class="axis-label y-label" style="top: 25%">2</div>
+                            <div class="axis-label y-label" style="top: 50%">1</div>
+                            <div class="axis-label y-label" style="top: 75%">0</div>
+                            <div class="axis-label y-label" style="top: 90%">-1</div>
+                            
+                            <!-- Curva logarítmica crescente (base 2) -->
+                            <div class="log-curve">
+                                <div class="log-point" style="left: 10%; bottom: 90%; background: #fdbb2d">
+                                    <div class="point-label">(0.5, -1)</div>
+                                </div>
+                                <div class="log-point" style="left: 25%; bottom: 75%; background: #fdbb2d">
+                                    <div class="point-label">(1, 0)</div>
+                                </div>
+                                <div class="log-point" style="left: 50%; bottom: 50%; background: #fdbb2d">
+                                    <div class="point-label">(2, 1)</div>
+                                </div>
+                                <div class="log-point" style="left: 75%; bottom: 25%; background: #fdbb2d">
+                                    <div class="point-label">(4, 2)</div>
+                                </div>
+                                <div class="log-point" style="left: 90%; bottom: 10%; background: #fdbb2d">
+                                    <div class="point-label">(8, 3)</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Curva logarítmica decrescente (base 1/2) -->
+                            <div class="log-curve">
+                                <div class="log-point" style="left: 10%; bottom: 10%; background: #1a2a6c">
+                                    <div class="point-label">(0.5, 1)</div>
+                                </div>
+                                <div class="log-point" style="left: 25%; bottom: 25%; background: #1a2a6c">
+                                    <div class="point-label">(1, 0)</div>
+                                </div>
+                                <div class="log-point" style="left: 50%; bottom: 50%; background: #1a2a6c">
+                                    <div class="point-label">(2, -1)</div>
+                                </div>
+                                <div class="log-point" style="left: 75%; bottom: 75%; background: #1a2a6c">
+                                    <div class="point-label">(4, -2)</div>
+                                </div>
+                                <div class="log-point" style="left: 90%; bottom: 90%; background: #1a2a6c">
+                                    <div class="point-label">(8, -3)</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Linhas da curva crescente -->
+                            <div class="curve-line" style="left: 10%; bottom: 90%; width: 15%; transform: rotate(-63deg); background: #fdbb2d"></div>
+                            <div class="curve-line" style="left: 25%; bottom: 75%; width: 25%; transform: rotate(-45deg); background: #fdbb2d"></div>
+                            <div class="curve-line" style="left: 50%; bottom: 50%; width: 25%; transform: rotate(-27deg); background: #fdbb2d"></div>
+                            <div class="curve-line" style="left: 75%; bottom: 25%; width: 15%; transform: rotate(-14deg); background: #fdbb2d"></div>
+                            
+                            <!-- Linhas da curva decrescente -->
+                            <div class="curve-line" style="left: 10%; bottom: 10%; width: 15%; transform: rotate(63deg); background: #1a2a6c"></div>
+                            <div class="curve-line" style="left: 25%; bottom: 25%; width: 25%; transform: rotate(45deg); background: #1a2a6c"></div>
+                            <div class="curve-line" style="left: 50%; bottom: 50%; width: 25%; transform: rotate(27deg); background: #1a2a6c"></div>
+                            <div class="curve-line" style="left: 75%; bottom: 75%; width: 15%; transform: rotate(14deg); background: #1a2a6c"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="aplicacoes" class="section">
+            <h2>Aplicações das Funções Logarítmicas</h2>
+            <div class="application-cards">
+                <div class="card">
+                    <div class="card-icon">📊</div>
+                    <h3>Escalas Logarítmicas</h3>
+                    <p>Usadas em gráficos para representar dados que variam em várias ordens de magnitude, como a escala Richter para terremotos.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">💰</div>
+                    <h3>Juros Compostos</h3>
+                    <p>O cálculo do tempo necessário para um investimento atingir determinado valor utiliza funções logarítmicas.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🔊</div>
+                    <h3>Decibéis</h3>
+                    <p>A intensidade sonora é medida em decibéis, uma escala logarítmica que relaciona a pressão sonora à audição humana.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🧪</div>
+                    <h3>pH em Química</h3>
+                    <p>O pH é uma medida logarítmica da concentração de íons de hidrogênio em uma solução.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">📈</div>
+                    <h3>Crescimento Populacional</h3>
+                    <p>Modelos de crescimento populacional frequentemente utilizam funções logarítmicas para prever tendências.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">💻</div>
+                    <h3>Complexidade Algorítmica</h3>
+                    <p>Em ciência da computação, a notação O(log n) descreve algoritmos eficientes como busca binária.</p>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>Infográfico Interativo - Funções Logarítmicas</p>
+            <p>Explore, aprenda e interaja com a matemática!</p>
+        </footer>
+    </div>
+
+    <script>
+        // Animação ao rolar a página
+        document.addEventListener('DOMContentLoaded', function() {
+            const sections = document.querySelectorAll('.section');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+
+            // Alterar imagens de fundo ao rolar
+            window.addEventListener('scroll', function() {
+                const scrollPosition = window.scrollY;
+                const windowHeight = window.innerHeight;
+                const docHeight = document.documentElement.scrollHeight;
+                
+                const scrollPercentage = scrollPosition / (docHeight - windowHeight);
+                
+                const backgrounds = document.querySelectorAll('.background-slide');
+                
+                if (scrollPercentage < 0.33) {
+                    backgrounds[0].style.opacity = 1;
+                    backgrounds[1].style.opacity = 0;
+                    backgrounds[2].style.opacity = 0;
+                } else if (scrollPercentage < 0.66) {
+                    backgrounds[0].style.opacity = 0;
+                    backgrounds[1].style.opacity = 1;
+                    backgrounds[2].style.opacity = 0;
+                } else {
+                    backgrounds[0].style.opacity = 0;
+                    backgrounds[1].style.opacity = 0;
+                    backgrounds[2].style.opacity = 1;
+                }
+            });
+        });
+
+        // Função para mostrar/ocultar informações
+        function toggleInfo(type) {
+            const content = document.getElementById(`${type}-content`);
+            const button = event.target;
+            
+            // Fechar todos os outros conteúdos
+            const allContents = document.querySelectorAll('.info-content');
+            const allButtons = document.querySelectorAll('.btn');
+            
+            allContents.forEach(item => {
+                if (item !== content) {
+                    item.classList.remove('active');
+                }
+            });
+            
+            allButtons.forEach(btn => {
+                if (btn !== button) {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // Alternar o conteúdo atual
+            content.classList.toggle('active');
+            button.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>
